@@ -131,67 +131,17 @@ def mcmc(s,r,l,mix,R):
   return X
 
 
-def chiba_nishizeki(vertices, edges, fun=None):
-    trans = dict(zip(vertices, range(len(vertices))))
-
-    neighbors = [[] for _ in range(len(vertices)) ]
-    rev_neighbors = [[] for _ in range(len(vertices)) ]
-
-    for u, v in edges:
-        i, j = trans[u], trans[v]
-        neighbors[i].append(j)
-        rev_neighbors[j].append(i)
-
-    degrees = [ -len(ns) for ns in neighbors ]
-    ix = np.argsort(degrees)
-
-    marked = np.zeros(len(vertices), dtype=np.int8)
-    num_triangles = 0
-
-#   print(neighbors)
-#   print(rev_neighbors)
-#   print("Preparation done")
-
-    for v in ix:
-#       print("------>", v)
-        for w in rev_neighbors[v]:
-            marked[w] = 1
-
-        for u in neighbors[v]:
-            for w in neighbors[u]:
-                if marked[w]:
-                    num_triangles += 1
-                    if fun is not None:
-                        fun(vertices[v], vertices[u], vertices[w])
-                marked[u] = 0
-            rev_neighbors[u].remove(v)
-
-        for w in rev_neighbors[v]:
-            neighbors[w].remove(v)
-            marked[w] = 0
-
-#       print(neighbors)
-#       print(rev_neighbors)
-
-    return num_triangles
-
-
-nodes = adj_list.keys()
-edges = []
-for i in nodes:
-    for j in adj_list[i]:
-        edges.append([i,j])
-
 
 s=0
 r=length
 R = random_walk(s,r)
 
+'''
 start_cn = time.process_time()
 cn_tr = chiba_nishizeki(nodes,edges)
 time_needed_cn = time.process_time() - start_cn
 print(cn_tr)
-
+'''
 
 start_mcmc = time.process_time()
 mcmc_tr = mcmc(0,length,int(0.05*length),75,R)
@@ -203,7 +153,7 @@ time_needed_tr = time.process_time() - start_tetris
 
 
 f = open("plot.txt",'a')
-f.write(str(len(edges))+","+str(cn_tr)+ "," + str(time_needed_cn)+ "," + str(mcmc_tr)+ "," + str(time_needed_mcmc) + "," + str(tetris_tr)+ "," + str(time_needed_tr)+ "\n")
-#f.write( str(mcmc_tr)+ "," + str(time_needed_mcmc) + "," + str(tetris_tr)+ "," + str(time_needed_tr)+ "\n")
+#f.write(str(len(edges))+","+str(cn_tr)+ "," + str(time_needed_cn)+ "," + str(mcmc_tr)+ "," + str(time_needed_mcmc) + "," + str(tetris_tr)+ "," + str(time_needed_tr)+ "\n")
+f.write( str(mcmc_tr)+ "," + str(time_needed_mcmc) + "," + str(tetris_tr)+ "," + str(time_needed_tr)+ "\n")
 
 f.close()
